@@ -19,13 +19,11 @@ def mosaic(data):
 
 def demosaic(mosaic, x, y, z):
     data = np.zeros((x, y, z), dtype=mosaic.dtype)
-    n = int(np.ceil(np.sqrt(z)))  # Ensure n is an integer
-    dim = int(np.sqrt(np.prod(mosaic.shape)))  # Explicitly cast to int
+    n = int(np.ceil(np.sqrt(z)))
+    dim = int(np.sqrt(np.prod(mosaic.shape)))
     mosaic = mosaic.reshape(dim, dim)
     for idx in range(z):
-        x_idx = (
-            int(np.floor(idx / n)) * x
-        )  # Use / for division and explicitly convert to int
+        x_idx = int(np.floor(idx / n)) * x
         y_idx = (idx % n) * y
         data[..., idx] = mosaic[x_idx : x_idx + x, y_idx : y_idx + y]
     return data
@@ -115,10 +113,8 @@ class ExternalImage(object):
         values = []
         for val in hdr_info._asdict().values():
             if isinstance(val, list):
-                # If val is a list (e.g., for the voxelToWorldMatrix), extend the list of values
                 values.extend(val)
             else:
-                # If val is supposed to be a string, it needs to be encoded to bytes
                 if isinstance(val, str):
                     val = val.encode("utf-8")
                 values.append(val)
@@ -126,12 +122,11 @@ class ExternalImage(object):
 
     def create_header(self, img, idx, nt, mosaic: bool):
         x, y, z, t = img.shape
-        sx, sy, sz, tr = (
-            img.header.get_zooms()
-        )  # Updated to direct attribute access if using a newer nibabel version
-        affine = img.affine.flatten().tolist()  # Direct access to the affine attribute
+        # Updated to direct attribute access if using a newer nibabel version
+        sx, sy, sz, tr = img.header.get_zooms()
+        # Direct access to the affine attribute
+        affine = img.affine.flatten().tolist()
 
-        # Define the namedtuple instance with updated field values
         EInfo = self.named_tuple_class
         infotuple = EInfo(
             magic=b"ERTI",  # Keep as bytes since it's likely intended to be binary data
@@ -207,14 +202,13 @@ class ExternalImage(object):
                 h.numPixelsRead,
                 h.numPixelsPhase,
                 h.numSlices,
-            )  # Assuming demosaic is also a method
+            )
         else:
             data = np.array(data, dtype=np.uint16).reshape(
                 (h.numPixelsRead, h.numPixelsPhase, h.numSlices)
             )
         affine = np.array(h.voxelToWorldMatrix).reshape((4, 4))
         img = nb.Nifti1Image(data, affine)
-        # Use header directly for setting zooms and units
         img.header.set_zooms(
             (h.pixelSpacingReadMM, h.pixelSpacingPhaseMM, h.pixelSpacingSliceMM)
         )
@@ -223,7 +217,7 @@ class ExternalImage(object):
 
     def process_header(self, in_bytes):
         magic = struct.unpack("4s", in_bytes[:4])[0]
-        print(magic.decode("utf-8"))  # Decode bytes object for printing
+        print(magic.decode("utf-8"))
         if magic in [b"ERTI", b"SIMU"]:
             self.hdr = self.hdr_from_bytes(in_bytes)
             print(f"header received: TR={self.hdr.currentTR}")

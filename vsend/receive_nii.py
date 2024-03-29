@@ -40,7 +40,7 @@ def handler_factory(callback, infoclient):
 
 
 def process_data_callback(infoclient, sock):
-    print("received info")  # Updated to use print function
+    print("received info")
     infoclient.process_data(sock)
 
 
