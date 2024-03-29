@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "vsend"
+version = "0.1.0"
+description = ""
+authors = ["eduardojdiniz <edd32@pitt.edu>"]
+readme = "README.md"
+packages = [{ include = "vsend" }]
+
+[tool.poetry.dependencies]
+python = "3.12"
+nibabel = "5.2.1"
+numpy = "1.26.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
